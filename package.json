@@ -9,7 +9,12 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "apollo-datasource-dynamodb": "^1.0.2",
     "apollo-server-lambda": "^2.12.0",
+    "aws-sdk": "^2.665.0",
     "graphql": "^15.0.0"
+  },
+  "devDependencies": {
+    "prettier": "^2.0.5"
   }
 }

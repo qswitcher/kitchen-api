@@ -1,24 +1,38 @@
 // graphql.js
 
 const { ApolloServer, gql } = require('apollo-server-lambda');
+const RecipesAPI = require('./datasources/recipes');
+const Resolvers = require('./resolvers/recipes');
 
-// Construct a schema, using GraphQL schema language
 const typeDefs = gql`
+  type Recipe {
+    name: String!
+    slug: String!
+  }
+
+  input RecipeInput {
+    name: String!
+    slug: String!
+  }
+
   type Query {
-    hello: String
+    recipe(slug: String!): Recipe
+  }
+
+  type Mutation {
+    createRecipe(recipe: RecipeInput!): Recipe
   }
 `;
 
 // Provide resolver functions for your schema fields
-const resolvers = {
-  Query: {
-    hello: () => 'Hello world!',
-  },
-};
+const resolvers = Resolvers;
 
 const server = new ApolloServer({
   typeDefs,
   resolvers,
+  dataSources: () => ({
+    recipesAPI: new RecipesAPI(),
+  }),
   playground: {
     endpoint: '/dev/graphql',
   },

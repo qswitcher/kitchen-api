@@ -1,9 +1,35 @@
 # serverless.yml
 
-service: apollo-lambda
+service: kitchen-api
 provider:
   name: aws
   runtime: nodejs12.x
+  environment:
+    RECIPES_TABLE: ${self:service}-${self:provider.stage}-recipes
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:PutItem
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.RECIPES_TABLE}'
+
+resources:
+  Resources:
+    NicknamesTable:
+      Type: 'AWS::DynamoDB::Table'
+      Properties:
+        AttributeDefinitions:
+          - AttributeName: slug
+            AttributeType: S
+        KeySchema:
+          - AttributeName: slug
+            KeyType: HASH
+        ProvisionedThroughput:
+          ReadCapacityUnits: 1
+          WriteCapacityUnits: 1
+        TableName: ${self:provider.environment.RECIPES_TABLE}
+
 functions:
   graphql:
     # this is formatted as <FILENAME>.<HANDLER>
