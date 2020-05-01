@@ -10,9 +10,11 @@ module.exports = gql`
     ingredients: [String!]!
   }
 
-  type RecipeConnection {
+  type RecipePage {
     items: [Recipe!]!
-    nextToken: String
+    page: Int!
+    pageCount: Int!
+    pageSize: Int!
   }
 
   input RecipeInput {
@@ -26,7 +28,7 @@ module.exports = gql`
 
   type Query {
     recipe(slug: String!): Recipe
-    recipes(limit: Int!, nextToken: String): RecipeConnection
+    recipes(page: Int!, pageSize: Int!): RecipePage
   }
 
   type Mutation {

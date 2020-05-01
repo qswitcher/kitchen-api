@@ -16,24 +16,34 @@ class Recipes extends DynamoDBDataSource {
     this.ttl = 30 * 60; // 30 minutes
   }
 
-  async getAllRecipes({ limit, nextToken }) {
-    const scanInput = {
+  async getAllRecipes({ page, pageSize }) {
+    // first scan to get all pages
+    const pageScan = {
       TableName: this.tableName,
-      Limit: limit,
+      ProjectionExpression: 'slug',
+      Limit: 100,
     };
 
-    if (nextToken) {
-      scanInput.ExclusiveStartKey = {
-        slug: nextToken,
-      };
+    const slugs = await this.scan(pageScan, this.ttl);
+
+    const scanInput = {
+      TableName: this.tableName,
+      Limit: pageSize,
+    };
+
+    if (page > 1) {
+      // get token formainquery
+      const nextToken = slugs[(page - 1) * pageSize];
+
+      scanInput.ExclusiveStartKey = nextToken;
     }
+
     const items = await this.scan(scanInput, this.ttl);
     return {
       items,
-      nextToken:
-        items.length < limit || items.length === 0
-          ? null
-          : items[items.length - 1].slug,
+      page,
+      pageSize,
+      pageCount: Math.ceil(slugs.length / pageSize),
     };
   }
 
