@@ -12,16 +12,34 @@ class Recipes extends DynamoDBDataSource {
       ],
       config
     );
+    this.tableName = process.env.RECIPES_TABLE;
     this.ttl = 30 * 60; // 30 minutes
   }
 
-  async getAllRecipes() {
-    return this.scan;
+  async getAllRecipes({ limit, nextToken }) {
+    const scanInput = {
+      TableName: this.tableName,
+      Limit: limit,
+    };
+
+    if (nextToken) {
+      scanInput.ExclusiveStartKey = {
+        slug: nextToken,
+      };
+    }
+    const items = await this.scan(scanInput, this.ttl);
+    return {
+      items,
+      nextToken:
+        items.length < limit || items.length === 0
+          ? null
+          : items[items.length - 1].slug,
+    };
   }
 
   async getRecipe(slug) {
     const getItemInput = {
-      TableName: process.env.RECIPES_TABLE,
+      TableName: this.tableName,
       ConsistentRead: true,
       Key: { slug },
     };
@@ -30,6 +48,11 @@ class Recipes extends DynamoDBDataSource {
 
   async createRecipe(item) {
     return this.put(item, this.ttl);
+  }
+
+  async deleteRecipe(slug) {
+    await this.delete({ slug });
+    return slug;
   }
 }
 

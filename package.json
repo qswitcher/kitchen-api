@@ -4,7 +4,8 @@
   "description": "GraphQL API for Kitchen Planner app",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "nodemon -r dotenv/config index.js"
   },
   "author": "",
   "license": "ISC",
@@ -15,6 +16,9 @@
     "graphql": "^15.0.0"
   },
   "devDependencies": {
+    "apollo-server": "^2.12.0",
+    "dotenv": "^8.2.0",
+    "nodemon": "^2.0.3",
     "prettier": "^2.0.5"
   }
 }

@@ -1,35 +1,10 @@
-// graphql.js
-
-const { ApolloServer, gql } = require('apollo-server-lambda');
+// serverless entrypoint
+const { ApolloServer } = require('apollo-server-lambda');
 const RecipesAPI = require('./datasources/recipes');
-const Resolvers = require('./resolvers/recipes');
-
-const typeDefs = gql`
-  type Recipe {
-    name: String!
-    slug: String!
-  }
-
-  input RecipeInput {
-    name: String!
-    slug: String!
-  }
-
-  type Query {
-    recipe(slug: String!): Recipe
-  }
-
-  type Mutation {
-    createRecipe(recipe: RecipeInput!): Recipe
-  }
-`;
-
-// Provide resolver functions for your schema fields
-const resolvers = Resolvers;
+const schema = require('./schema');
 
 const server = new ApolloServer({
-  typeDefs,
-  resolvers,
+  ...schema,
   dataSources: () => ({
     recipesAPI: new RecipesAPI(),
   }),
