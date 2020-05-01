@@ -11,7 +11,9 @@ provider:
       Action:
         - dynamodb:GetItem
         - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
         - dynamodb:PutItem
+        - dynamodb:Scan
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.RECIPES_TABLE}'
 
 resources:
