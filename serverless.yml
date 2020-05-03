@@ -1,11 +1,15 @@
 # serverless.yml
 
 service: kitchen-api
+
+custom:
+  tableName: ${self:service}-${self:provider.stage}-recipes
+
 provider:
   name: aws
   runtime: nodejs12.x
   environment:
-    RECIPES_TABLE: ${self:service}-${self:provider.stage}-recipes
+    RECIPES_TABLE: ${self:custom.tableName}
   iamRoleStatements:
     - Effect: Allow
       Action:
@@ -14,23 +18,13 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:PutItem
         - dynamodb:Scan
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:provider.environment.RECIPES_TABLE}'
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tableName}'
 
 resources:
-  Resources:
-    NicknamesTable:
-      Type: 'AWS::DynamoDB::Table'
-      Properties:
-        AttributeDefinitions:
-          - AttributeName: slug
-            AttributeType: S
-        KeySchema:
-          - AttributeName: slug
-            KeyType: HASH
-        ProvisionedThroughput:
-          ReadCapacityUnits: 1
-          WriteCapacityUnits: 1
-        TableName: ${self:provider.environment.RECIPES_TABLE}
+  - ${file(resources/s3-bucket.yml)}
+  - ${file(resources/dynamodb-table.yml)}
+  - ${file(resources/cognito-user-pool.yml)}
+  - ${file(resources/cognito-identity-pool.yml)}
 
 functions:
   graphql:

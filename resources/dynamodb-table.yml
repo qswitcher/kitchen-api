@@ -1,0 +1,14 @@
+Resources:
+  NicknamesTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: slug
+          AttributeType: S
+      KeySchema:
+        - AttributeName: slug
+          KeyType: HASH
+      ProvisionedThroughput:
+        ReadCapacityUnits: 1
+        WriteCapacityUnits: 1
+      TableName: ${self:provider.environment.RECIPES_TABLE}
