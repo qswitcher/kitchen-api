@@ -8,6 +8,12 @@ const server = new ApolloServer({
   dataSources: () => ({
     recipesAPI: new RecipesAPI(),
   }),
+  context: ({ event, context }) => ({
+    headers: event.headers,
+    functionName: context.functionName,
+    event,
+    context,
+  }),
   playground: {
     endpoint: '/dev/graphql',
   },
