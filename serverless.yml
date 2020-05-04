@@ -9,6 +9,8 @@ provider:
   name: aws
   runtime: nodejs12.x
   environment:
+    COGNITO_POOL_ID:
+      Ref: CognitoUserPool
     RECIPES_TABLE: ${self:custom.tableName}
   iamRoleStatements:
     - Effect: Allow

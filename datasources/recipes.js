@@ -1,4 +1,5 @@
 const { DynamoDBDataSource } = require('apollo-datasource-dynamodb');
+const { AuthenticationError } = require('apollo-server-lambda');
 
 class Recipes extends DynamoDBDataSource {
   constructor(config) {
@@ -57,10 +58,12 @@ class Recipes extends DynamoDBDataSource {
   }
 
   async createRecipe(item) {
+    if (!this.context.user_id) throw new AuthenticationError('Unauthorized');
     return this.put(item, this.ttl);
   }
 
   async deleteRecipe(slug) {
+    if (!this.context.user_id) throw new AuthenticationError('Unauthorized');
     await this.delete({ slug });
     return slug;
   }
