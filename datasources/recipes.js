@@ -1,5 +1,5 @@
 const { DynamoDBDataSource } = require('apollo-datasource-dynamodb');
-const { AuthenticationError } = require('apollo-server-lambda');
+const { AuthenticationError, UserInputError } = require('apollo-server-lambda');
 
 const isInt = (v) => v.match(/^\d+$/g);
 
@@ -85,6 +85,34 @@ class Recipes extends DynamoDBDataSource {
     // use new or generated slug
     item.slug = newSlug;
     return this.put(item, this.ttl);
+  }
+
+  async updateRecipe({ slug, ...rest }) {
+    if (!this.context.user_id) throw new AuthenticationError('Unauthorized');
+    if (!slug) throw new UserInputError('Slug required');
+
+    const updateExpressions = [];
+    const expressionAttributeNames = {};
+    const expressionAttributesValues = {};
+
+    Object.keys(rest).forEach((key) => {
+      updateExpressions.push(`#${key} = :${key}`);
+      expressionAttributeNames[`#${key}`] = key;
+      expressionAttributesValues[`:${key}`] = rest[key];
+    });
+
+    const updateExpression = `SET ${updateExpressions.join(', ')}`;
+
+    await this.update(
+      { slug },
+      updateExpression,
+      expressionAttributeNames,
+      expressionAttributesValues,
+      this.ttl
+    );
+
+    // get fresh copy
+    return this.getRecipe(slug);
   }
 
   async deleteRecipe(slug) {

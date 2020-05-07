@@ -30,6 +30,17 @@ module.exports = gql`
     instructions: [String!]!
   }
 
+  input RecipeUpdateInput {
+    title: String
+    shortDescription: String
+    longDescription: String
+    slug: String! # slug is the only required input since we use it to lookup the recipe
+    photo: String
+    thumbnail: String
+    ingredients: [String!]
+    instructions: [String!]
+  }
+
   type Query {
     recipe(slug: String!): Recipe
     recipes(page: Int!, pageSize: Int!): RecipePage
@@ -37,6 +48,7 @@ module.exports = gql`
 
   type Mutation {
     createRecipe(recipe: RecipeInput!): Recipe
+    updateRecipe(recipe: RecipeUpdateInput!): Recipe
     deleteRecipe(slug: String!): String
   }
 `;

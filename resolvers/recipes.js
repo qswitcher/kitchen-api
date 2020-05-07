@@ -8,6 +8,8 @@ module.exports = {
   Mutation: {
     createRecipe: (_, { recipe }, { dataSources }) =>
       dataSources.recipesAPI.createRecipe(recipe),
+    updateRecipe: (_, { recipe }, { dataSources }) =>
+      dataSources.recipesAPI.updateRecipe(recipe),
     deleteRecipe: (_, { slug }, { dataSources }) =>
       dataSources.recipesAPI.deleteRecipe(slug),
   },
