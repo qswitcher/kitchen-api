@@ -2,6 +2,7 @@ Resources:
   UploadsBucket:
     Type: AWS::S3::Bucket
     Properties:
+      AccessControl: PublicRead
       # Set the CORS policy
       CorsConfiguration:
         CorsRules:
@@ -16,6 +17,23 @@ Resources:
               - DELETE
               - HEAD
             MaxAge: 3000
+  UploadsBucketPolicy:
+    Type: 'AWS::S3::BucketPolicy'
+    Properties:
+      PolicyDocument:
+        Statement:
+          - Sid: PublicReadForGetBucketObjects
+            Effect: Allow
+            Principal: '*'
+            Action:
+              - 's3:GetObject'
+            Resource:
+              - Fn::Join:
+                  - ''
+                  - - Fn::GetAtt: [UploadsBucket, Arn]
+                    - '/*'
+      Bucket:
+        Ref: UploadsBucket
 
 # Print out the name of the bucket that is created
 Outputs:

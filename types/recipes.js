@@ -6,8 +6,10 @@ module.exports = gql`
     shortDescription: String!
     longDescription: String!
     slug: String!
+    photo: String
     thumbnail: String
     ingredients: [String!]!
+    instructions: [String!]!
   }
 
   type RecipePage {
@@ -21,9 +23,11 @@ module.exports = gql`
     title: String!
     shortDescription: String!
     longDescription: String!
-    slug: String!
+    slug: String # if not provided, slug will be auto-generated from title
+    photo: String
     thumbnail: String
     ingredients: [String!]!
+    instructions: [String!]!
   }
 
   type Query {

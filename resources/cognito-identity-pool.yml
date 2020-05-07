@@ -64,7 +64,7 @@ Resources:
                   - Fn::Join:
                       - ''
                       - - Fn::GetAtt: [UploadsBucket, Arn]
-                        - '/uploads/*'
+                        - '/*'
 
 # Print out the Id of the Identity Pool that is created
 Outputs:

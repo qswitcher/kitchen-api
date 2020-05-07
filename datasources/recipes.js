@@ -1,6 +1,8 @@
 const { DynamoDBDataSource } = require('apollo-datasource-dynamodb');
 const { AuthenticationError } = require('apollo-server-lambda');
 
+const isInt = (v) => v.match(/^\d+$/g);
+
 class Recipes extends DynamoDBDataSource {
   constructor(config) {
     super(
@@ -59,6 +61,29 @@ class Recipes extends DynamoDBDataSource {
 
   async createRecipe(item) {
     if (!this.context.user_id) throw new AuthenticationError('Unauthorized');
+    // get slug from client or generate one
+    let newSlug =
+      item.slug || item.title.toLowerCase().trim().replace(/\s+/g, '-');
+
+    // if slug exists, we need to generate a new one
+    if (await this.getRecipe(newSlug)) {
+      const tokens = newSlug.split('-');
+      let startNum = 1;
+      if (tokens.length > 1 && isInt(tokens[tokens.length - 1])) {
+        startNum = parseInt(tokens.pop(), 10);
+      }
+
+      newSlug = [...tokens, startNum].join('-');
+      let item = await this.getRecipe(newSlug);
+      while (item) {
+        startNum += 1;
+        newSlug = [...tokens, startNum].join('-');
+        item = await this.getRecipe(newSlug);
+      }
+    }
+
+    // use new or generated slug
+    item.slug = newSlug;
     return this.put(item, this.ttl);
   }
 
