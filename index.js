@@ -1,6 +1,6 @@
 // dev server for development
 const AWS = require('aws-sdk');
-const { ApolloServer } = require('apollo-server');
+const { ApolloServer, AuthenticationError } = require('apollo-server');
 const RecipesAPI = require('./datasources/recipes');
 const schema = require('./schema');
 const tokenVerifier = require('./utils/token-verifier');
@@ -21,6 +21,7 @@ const server = new ApolloServer({
         const claim = await tokenVerifier(req.headers.authorization);
         return { user_id: claim.username };
       } catch (err) {
+        console.log(err);
         throw new AuthenticationError('Invalid token');
       }
     }
