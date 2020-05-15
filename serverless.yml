@@ -3,7 +3,9 @@
 service: kitchen-api
 
 custom:
-  tableName: ${self:service}-${self:provider.stage}-recipes
+  legacyTableName: ${self:service}-${self:provider.stage}-recipes
+  tableName: ${self:service}_${self:provider.stage}
+  gsi1: ${self:service}_gsi1_${self:provider.stage}
 
 provider:
   name: aws
@@ -11,8 +13,17 @@ provider:
   environment:
     COGNITO_POOL_ID:
       Ref: CognitoUserPool
-    RECIPES_TABLE: ${self:custom.tableName}
+    RECIPES_TABLE: ${self:custom.legacyTableName}
+    MAIN_TABLE: ${self:custom.tableName}
   iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:GetItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+        - dynamodb:PutItem
+        - dynamodb:Scan
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.legacyTableName}'
     - Effect: Allow
       Action:
         - dynamodb:GetItem

@@ -15,14 +15,14 @@ class Recipes extends DynamoDBDataSource {
       ],
       config
     );
-    this.tableName = process.env.RECIPES_TABLE;
+    this.legacyTableName = process.env.RECIPES_TABLE;
     this.ttl = 30 * 60; // 30 minutes
   }
 
   async getAllRecipes({ page, pageSize }) {
     // first scan to get all pages
     const pageScan = {
-      TableName: this.tableName,
+      TableName: this.legacyTableName,
       ProjectionExpression: 'slug',
       Limit: 100,
     };
@@ -30,7 +30,7 @@ class Recipes extends DynamoDBDataSource {
     const slugs = await this.scan(pageScan, this.ttl);
 
     const scanInput = {
-      TableName: this.tableName,
+      TableName: this.legacyTableName,
       Limit: pageSize,
     };
 
@@ -52,7 +52,7 @@ class Recipes extends DynamoDBDataSource {
 
   async getRecipe(slug) {
     const getItemInput = {
-      TableName: this.tableName,
+      TableName: this.legacyTableName,
       ConsistentRead: true,
       Key: { slug },
     };
