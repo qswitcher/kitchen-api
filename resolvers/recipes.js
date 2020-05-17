@@ -1,16 +1,16 @@
 module.exports = {
   Query: {
     recipe: (_, { slug }, { dataSources }) =>
-      dataSources.recipesAPI.getRecipe(slug),
+      dataSources.dynamoDbAPI.getRecipeBySlug(slug),
     recipes: (_, args, { dataSources }) =>
-      dataSources.recipesAPI.getAllRecipes(args),
+      dataSources.dynamoDbAPI.getAllRecipes(args),
   },
   Mutation: {
     createRecipe: (_, { recipe }, { dataSources }) =>
-      dataSources.recipesAPI.createRecipe(recipe),
+      dataSources.dynamoDbAPI.createRecipe(recipe),
     updateRecipe: (_, { recipe }, { dataSources }) =>
-      dataSources.recipesAPI.updateRecipe(recipe),
-    deleteRecipe: (_, { slug }, { dataSources }) =>
-      dataSources.recipesAPI.deleteRecipe(slug),
+      dataSources.dynamoDbAPI.updateRecipe(recipe),
+    deleteRecipe: (_, { id }, { dataSources }) =>
+      dataSources.dynamoDbAPI.deleteRecipe(id),
   },
 };

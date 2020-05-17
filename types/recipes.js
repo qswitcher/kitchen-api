@@ -2,6 +2,7 @@ const { gql } = require('apollo-server-lambda');
 
 module.exports = gql`
   type Recipe {
+    id: ID!
     title: String!
     shortDescription: String!
     longDescription: String!
@@ -31,10 +32,11 @@ module.exports = gql`
   }
 
   input RecipeUpdateInput {
+    id: ID!
     title: String
     shortDescription: String
     longDescription: String
-    slug: String! # slug is the only required input since we use it to lookup the recipe
+    slug: String
     photo: String
     thumbnail: String
     ingredients: [String!]
@@ -49,6 +51,6 @@ module.exports = gql`
   type Mutation {
     createRecipe(recipe: RecipeInput!): Recipe
     updateRecipe(recipe: RecipeUpdateInput!): Recipe
-    deleteRecipe(slug: String!): String
+    deleteRecipe(id: ID!): String
   }
 `;

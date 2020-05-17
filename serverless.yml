@@ -15,6 +15,7 @@ provider:
       Ref: CognitoUserPool
     RECIPES_TABLE: ${self:custom.legacyTableName}
     MAIN_TABLE: ${self:custom.tableName}
+    MAIN_TABLE_GSI1: ${self:custom.gsi1}
   iamRoleStatements:
     - Effect: Allow
       Action:
