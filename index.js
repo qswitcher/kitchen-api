@@ -1,7 +1,6 @@
 // dev server for development
 const AWS = require('aws-sdk');
 const { ApolloServer, AuthenticationError } = require('apollo-server');
-const RecipesAPI = require('./datasources/recipes');
 const DynamoDBAPI = require('./datasources/dynamodb');
 const schema = require('./schema');
 const tokenVerifier = require('./utils/token-verifier');
@@ -12,7 +11,6 @@ const tokenVerifier = require('./utils/token-verifier');
 const server = new ApolloServer({
   ...schema,
   dataSources: () => ({
-    recipesAPI: new RecipesAPI(),
     dynamoDbAPI: new DynamoDBAPI(),
   }),
   context: async ({ req }) => {
