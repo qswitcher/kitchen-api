@@ -2,12 +2,18 @@ const { AuthenticationError, UserInputError } = require('apollo-server-lambda');
 const { DataSource } = require('apollo-datasource');
 const { DynamoDB } = require('aws-sdk');
 const { v4: uuidv4 } = require('uuid');
+const algoliasearch = require('algoliasearch');
 
 const isInt = (v) => v.match(/^\d+$/g);
 
 class DynamoDbAPI extends DataSource {
   constructor(config = {}) {
     super();
+    const client = algoliasearch(
+      process.env.ALGOLIA_ID,
+      process.env.ALGOLIA_KEY
+    );
+    this.searchClient = client.initIndex('recipes');
     this.tableName = process.env.MAIN_TABLE;
     this.gsi1 = process.env.MAIN_TABLE_GSI1;
     this.tableKeys = [
@@ -43,9 +49,40 @@ class DynamoDbAPI extends DataSource {
   itemToRecipe(item) {
     const { key, data, sort, ...rest } = item;
     return {
+      ...rest,
       id: key,
       slug: data,
-      ...rest,
+    };
+  }
+
+  async search({ input: { q = '', page, pageSize } }) {
+    const response = await this.searchClient.search(q, {
+      attributesToRetrieve: ['objectID'],
+      page: page - 1,
+      hitsPerPage: pageSize,
+    });
+    const { hits, nbPages } = response;
+
+    const output = await this.dynamoDbDocClient
+      .batchGet({
+        RequestItems: {
+          [this.tableName]: {
+            Keys: hits.map(({ objectID }) => ({
+              key: objectID,
+              sort: 'Recipe',
+            })),
+          },
+        },
+      })
+      .promise();
+
+    return {
+      items: output.Responses[this.tableName].map((item) =>
+        this.itemToRecipe(item)
+      ),
+      page,
+      pageSize,
+      pageCount: nbPages,
     };
   }
 

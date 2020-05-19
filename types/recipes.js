@@ -43,9 +43,16 @@ module.exports = gql`
     instructions: [String!]
   }
 
+  input SearchInput {
+    page: Int!
+    pageSize: Int!
+    q: String
+  }
+
   type Query {
     recipe(slug: String!): Recipe
     recipes(page: Int!, pageSize: Int!): RecipePage
+    recipeSearch(input: SearchInput!): RecipePage
   }
 
   type Mutation {

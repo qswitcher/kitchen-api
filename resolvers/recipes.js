@@ -4,6 +4,8 @@ module.exports = {
       dataSources.dynamoDbAPI.getRecipeBySlug(slug),
     recipes: (_, args, { dataSources }) =>
       dataSources.dynamoDbAPI.getAllRecipes(args),
+    recipeSearch: (_, args, { dataSources }) =>
+      dataSources.dynamoDbAPI.search(args),
   },
   Mutation: {
     createRecipe: (_, { recipe }, { dataSources }) =>
