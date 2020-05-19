@@ -1,9 +1,10 @@
 # serverless.yml
 
 service: kitchen-api
+plugins:
+  - serverless-dotenv-plugin
 
 custom:
-  legacyTableName: ${self:service}-${self:provider.stage}-recipes
   tableName: ${self:service}_${self:provider.stage}
   gsi1: ${self:service}_gsi1_${self:provider.stage}
 
@@ -13,7 +14,6 @@ provider:
   environment:
     COGNITO_POOL_ID:
       Ref: CognitoUserPool
-    RECIPES_TABLE: ${self:custom.legacyTableName}
     MAIN_TABLE: ${self:custom.tableName}
     MAIN_TABLE_GSI1: ${self:custom.gsi1}
   iamRoleStatements:
@@ -24,23 +24,25 @@ provider:
         - dynamodb:DeleteItem
         - dynamodb:PutItem
         - dynamodb:Scan
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.legacyTableName}'
-    - Effect: Allow
-      Action:
-        - dynamodb:GetItem
-        - dynamodb:UpdateItem
-        - dynamodb:DeleteItem
-        - dynamodb:PutItem
-        - dynamodb:Scan
-      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/${self:custom.tableName}'
+        - dynamodb:Query
+      Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
 
 resources:
+  - ${file(resources/iam-roles.yml)}
   - ${file(resources/s3-bucket.yml)}
   - ${file(resources/dynamodb-table.yml)}
   - ${file(resources/cognito-user-pool.yml)}
   - ${file(resources/cognito-identity-pool.yml)}
 
 functions:
+  indexer:
+    role: indexerRole
+    handler: indexer.handler
+    events:
+      - stream:
+          type: dynamodb
+          arn:
+            Fn::GetAtt: [MainTable, StreamArn]
   graphql:
     # this is formatted as <FILENAME>.<HANDLER>
     handler: graphql.graphqlHandler

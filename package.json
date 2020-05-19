@@ -5,11 +5,12 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "nodemon -r dotenv/config index.js"
+    "start": "nodemon -r dotenv/config index.js dotenv_config_path=.env.local"
   },
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "algoliasearch": "^4.2.0",
     "apollo-datasource-dynamodb": "^1.0.2",
     "apollo-server-lambda": "^2.12.0",
     "aws-sdk": "^2.665.0",
@@ -23,7 +24,9 @@
   "devDependencies": {
     "apollo-server": "^2.12.0",
     "dotenv": "^8.2.0",
+    "jest": "^26.0.1",
     "nodemon": "^2.0.3",
-    "prettier": "^2.0.5"
+    "prettier": "^2.0.5",
+    "serverless-dotenv-plugin": "^2.4.2"
   }
 }
