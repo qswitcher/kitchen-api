@@ -18,6 +18,7 @@ module.exports = gql`
     page: Int!
     pageCount: Int!
     pageSize: Int!
+    resultCount: Int!
   }
 
   input RecipeInput {

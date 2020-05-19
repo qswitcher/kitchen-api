@@ -61,28 +61,34 @@ class DynamoDbAPI extends DataSource {
       page: page - 1,
       hitsPerPage: pageSize,
     });
-    const { hits, nbPages } = response;
+    const { hits, nbPages, nbHits } = response;
 
-    const output = await this.dynamoDbDocClient
-      .batchGet({
-        RequestItems: {
-          [this.tableName]: {
-            Keys: hits.map(({ objectID }) => ({
-              key: objectID,
-              sort: 'Recipe',
-            })),
+    let items = [];
+    if (hits.length > 0) {
+      const output = await this.dynamoDbDocClient
+        .batchGet({
+          RequestItems: {
+            [this.tableName]: {
+              Keys: hits.map(({ objectID }) => ({
+                key: objectID,
+                sort: 'Recipe',
+              })),
+            },
           },
-        },
-      })
-      .promise();
+        })
+        .promise();
+
+      items = output.Responses[this.tableName].map((item) =>
+        this.itemToRecipe(item)
+      );
+    }
 
     return {
-      items: output.Responses[this.tableName].map((item) =>
-        this.itemToRecipe(item)
-      ),
+      items,
       page,
       pageSize,
       pageCount: nbPages,
+      resultCount: nbHits,
     };
   }
 
