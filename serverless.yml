@@ -25,6 +25,7 @@ provider:
         - dynamodb:PutItem
         - dynamodb:Scan
         - dynamodb:Query
+        - dynamodb:BatchGetItem
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
 
 resources:
