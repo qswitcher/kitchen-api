@@ -56,6 +56,9 @@ class DynamoDbAPI extends DataSource {
   }
 
   async search({ input: { q = '', page, pageSize } }) {
+    if (!q) {
+      return this.getAllRecipes({ page, pageSize });
+    }
     const response = await this.searchClient.search(q, {
       attributesToRetrieve: ['objectID'],
       page: page - 1,
@@ -142,6 +145,7 @@ class DynamoDbAPI extends DataSource {
       page,
       pageSize,
       pageCount: Math.ceil(pageQueryOutput.Items.length / pageSize),
+      resultCount: pageQueryOutput.Count,
     };
   }
 
