@@ -27,24 +27,30 @@ exports.handler = (event, context, callback) => {
   const index = client.initIndex('recipes');
 
   event.Records.forEach((record) => {
-    const {
-      key,
-      title,
-      shortDescription,
-      longDescription,
-      ingredients,
-    } = unpack(record.dynamodb.NewImage);
+    if (record.eventName === 'REMOVE') {
+      const key = record.dynamodb.Keys.key.S;
+      console.log('Removing: ', key);
+      index.deleteObject(key);
+    } else {
+      const {
+        key,
+        title,
+        shortDescription,
+        longDescription,
+        ingredients,
+      } = unpack(record.dynamodb.NewImage);
 
-    const obj = {
-      objectID: key,
-      title,
-      shortDescription,
-      longDescription,
-      ingredients,
-    };
+      const obj = {
+        objectID: key,
+        title,
+        shortDescription,
+        longDescription,
+        ingredients,
+      };
 
-    console.log('Indexing: ', JSON.stringify(obj, null, 2));
-    index.saveObject(obj);
+      console.log('Indexing: ', JSON.stringify(obj, null, 2));
+      index.saveObject(obj);
+    }
   });
   callback(null, `Successfully processed ${event.Records.length} records.`);
 };

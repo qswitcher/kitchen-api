@@ -1,9 +1,9 @@
 // dev server for development
 const AWS = require('aws-sdk');
 const { ApolloServer, AuthenticationError } = require('apollo-server');
-const DynamoDBAPI = require('./datasources/dynamodb');
-const schema = require('./schema');
-const tokenVerifier = require('./utils/token-verifier');
+const DynamoDBAPI = require('../handlers/graphql/datasources/dynamodb');
+const schema = require('../handlers/graphql/schema');
+const tokenVerifier = require('../handlers/graphql/utils/token-verifier');
 
 // // not sure why this needed
 // AWS.config.update({ region: 'us-east-1' });

@@ -27,6 +27,22 @@ provider:
         - dynamodb:Query
         - dynamodb:BatchGetItem
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
+    - Effect: 'Allow'
+      Action:
+        - 's3:GetObject'
+      Resource:
+        - Fn::Join:
+            - ''
+            - - Fn::GetAtt: [UploadsBucket, Arn]
+              - '/*'
+    - Effect: 'Allow'
+      Action:
+        - 's3:PutObject'
+      Resource:
+        - Fn::Join:
+            - ''
+            - - Fn::GetAtt: [UploadsBucket, Arn]
+              - '/*'
 
 resources:
   - ${file(resources/iam-roles.yml)}
@@ -38,15 +54,14 @@ resources:
 functions:
   indexer:
     role: indexerRole
-    handler: indexer.handler
+    handler: src/handlers/indexer/index.handler
     events:
       - stream:
           type: dynamodb
           arn:
             Fn::GetAtt: [MainTable, StreamArn]
   graphql:
-    # this is formatted as <FILENAME>.<HANDLER>
-    handler: graphql.graphqlHandler
+    handler: src/handlers/graphql/index.handler
     events:
       - http:
           path: graphql
@@ -56,3 +71,13 @@ functions:
           path: graphql
           method: get
           cors: true
+  resize:
+    handler: src/handlers/resizer/index.handler
+    events:
+      - s3:
+          bucket:
+            Ref: UploadsBucket
+          event: s3:ObjectCreated:*
+          existing: true
+          rules:
+            - prefix: public/
