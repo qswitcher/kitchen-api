@@ -81,3 +81,9 @@ functions:
           existing: true
           rules:
             - prefix: public/
+  sync:
+    handler: src/handlers/sync/index.handler
+    events:
+      - http:
+          path: sync
+          method: get

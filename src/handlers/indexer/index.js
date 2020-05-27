@@ -29,7 +29,7 @@ exports.handler = (event, context, callback) => {
   event.Records.forEach((record) => {
     if (record.eventName === 'REMOVE') {
       const key = record.dynamodb.Keys.key.S;
-      console.log('Removing: ', key);
+      console.log({ msg: 'Deleting key', key });
       index.deleteObject(key);
     } else {
       const {
