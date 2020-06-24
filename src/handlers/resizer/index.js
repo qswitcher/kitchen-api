@@ -36,10 +36,15 @@ const handleResize = ({ bucket, key, width, height }) => {
             Bucket: bucket,
             ContentType: data.ContentType,
             Key: `thumbnails/${width}x${height}/${key.split('/').pop()}`,
-          }).promise()
+          })
+            .promise()
+            .then(() => console.log('Resize complete'))
         );
     });
 };
+
+exports.handleResize = handleResize;
+exports.SIZES = SIZES;
 
 exports.handler = async function (event) {
   return Promise.all(

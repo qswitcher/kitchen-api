@@ -14,6 +14,8 @@ provider:
   environment:
     COGNITO_POOL_ID:
       Ref: CognitoUserPool
+    UPLOAD_BUCKET:
+      Ref: UploadsBucket
     MAIN_TABLE: ${self:custom.tableName}
     MAIN_TABLE_GSI1: ${self:custom.gsi1}
   iamRoleStatements:
@@ -29,15 +31,7 @@ provider:
       Resource: 'arn:aws:dynamodb:${opt:region, self:provider.region}:*:table/*'
     - Effect: 'Allow'
       Action:
-        - 's3:GetObject'
-      Resource:
-        - Fn::Join:
-            - ''
-            - - Fn::GetAtt: [UploadsBucket, Arn]
-              - '/*'
-    - Effect: 'Allow'
-      Action:
-        - 's3:PutObject'
+        - 's3:*'
       Resource:
         - Fn::Join:
             - ''
