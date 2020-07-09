@@ -9,6 +9,7 @@ module.exports = gql`
     slug: String!
     photo: String
     thumbnail: String
+    originalUrl: String
     ingredients: [String!]!
     instructions: [String!]!
   }
@@ -30,6 +31,7 @@ module.exports = gql`
     thumbnail: String
     ingredients: [String!]!
     instructions: [String!]!
+    originalUrl: String
   }
 
   input RecipeUpdateInput {
@@ -42,6 +44,7 @@ module.exports = gql`
     thumbnail: String
     ingredients: [String!]
     instructions: [String!]
+    originalUrl: String
   }
 
   input SearchInput {

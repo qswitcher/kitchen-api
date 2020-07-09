@@ -28,7 +28,7 @@ exports.handler = async function () {
 
   console.log(`Syncing ${pageQueryOutput.Items.length} records`);
 
-  return Promise.all(
+  await Promise.all(
     pageQueryOutput.Items.map((item) =>
       SIZES.map(({ width, height }) =>
         handleResize({
@@ -40,4 +40,11 @@ exports.handler = async function () {
       )
     ).flat(1)
   );
+  return {
+    statusCode: 200,
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({ success: true }),
+  };
 };
