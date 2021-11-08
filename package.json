@@ -23,7 +23,7 @@
     "uuid": "^8.0.0"
   },
   "devDependencies": {
-    "apollo-server": "^2.12.0",
+    "apollo-server": "^2.25.3",
     "dotenv": "^8.2.0",
     "jest": "^26.0.1",
     "nodemon": "^2.0.3",
